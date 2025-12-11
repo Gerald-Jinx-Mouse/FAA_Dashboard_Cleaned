@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # Page configuration
 st.set_page_config(
@@ -59,20 +59,51 @@ def generate_sample_data(num_days=90):
     np.random.seed(42)
     dates = pd.date_range(end=datetime.now(), periods=num_days, freq='D')
     
+    # Generate base flight counts
+    total_flights = np.random.randint(40000, 50000, num_days)
+    cancelled_flights = np.random.randint(100, 1000, num_days)
+    diverted_flights = np.random.randint(50, 300, num_days)
+    
+    # Ensure delayed and on-time flights sum correctly with total
+    remaining_flights = total_flights - cancelled_flights - diverted_flights
+    delayed_flights = np.random.randint(5000, 10000, num_days)
+    # Ensure delayed flights don't exceed remaining flights
+    delayed_flights = np.minimum(delayed_flights, remaining_flights - 1000)
+    on_time_flights = remaining_flights - delayed_flights
+    
     data = {
         'date': dates,
-        'total_flights': np.random.randint(40000, 50000, num_days),
-        'on_time_flights': np.random.randint(30000, 40000, num_days),
-        'delayed_flights': np.random.randint(5000, 10000, num_days),
-        'cancelled_flights': np.random.randint(100, 1000, num_days),
-        'diverted_flights': np.random.randint(50, 300, num_days),
+        'total_flights': total_flights,
+        'on_time_flights': on_time_flights,
+        'delayed_flights': delayed_flights,
+        'cancelled_flights': cancelled_flights,
+        'diverted_flights': diverted_flights,
         'avg_delay_minutes': np.random.uniform(15, 45, num_days),
-        'weather_delays': np.random.randint(1000, 3000, num_days),
-        'carrier_delays': np.random.randint(1500, 3500, num_days),
-        'nas_delays': np.random.randint(500, 1500, num_days),
-        'security_delays': np.random.randint(50, 200, num_days),
-        'late_aircraft_delays': np.random.randint(1000, 2500, num_days),
     }
+    
+    # Generate delay types that sum to total delayed flights
+    for i in range(num_days):
+        total_delays = delayed_flights[i]
+        # Distribute delays across types with random proportions
+        proportions = np.random.dirichlet(np.ones(5))
+        weather = int(proportions[0] * total_delays)
+        carrier = int(proportions[1] * total_delays)
+        nas = int(proportions[2] * total_delays)
+        security = int(proportions[3] * total_delays)
+        late_aircraft = total_delays - (weather + carrier + nas + security)
+        
+        if i == 0:
+            data['weather_delays'] = [weather]
+            data['carrier_delays'] = [carrier]
+            data['nas_delays'] = [nas]
+            data['security_delays'] = [security]
+            data['late_aircraft_delays'] = [late_aircraft]
+        else:
+            data['weather_delays'].append(weather)
+            data['carrier_delays'].append(carrier)
+            data['nas_delays'].append(nas)
+            data['security_delays'].append(security)
+            data['late_aircraft_delays'].append(late_aircraft)
     
     df = pd.DataFrame(data)
     
@@ -93,8 +124,14 @@ def calculate_kpis(df):
     Returns:
         Dictionary with KPI values
     """
-    latest_data = df.tail(30)  # Last 30 days
-    previous_data = df.iloc[-60:-30]  # Previous 30 days
+    # Ensure we have enough data for trend calculations
+    if len(df) < 60:
+        # If less than 60 days, use available data for both periods
+        latest_data = df.tail(max(len(df) // 2, 1))
+        previous_data = df.head(max(len(df) // 2, 1))
+    else:
+        latest_data = df.tail(30)  # Last 30 days
+        previous_data = df.iloc[-60:-30]  # Previous 30 days
     
     kpis = {
         'total_flights': latest_data['total_flights'].sum(),
@@ -285,21 +322,24 @@ def main():
     
     with col2:
         # Flight status distribution (pie chart)
-        latest_day = df_filtered.iloc[-1]
-        flight_status = {
-            'On-Time': latest_day['on_time_flights'],
-            'Delayed': latest_day['delayed_flights'],
-            'Cancelled': latest_day['cancelled_flights'],
-            'Diverted': latest_day['diverted_flights']
-        }
-        
-        fig4 = px.pie(
-            values=list(flight_status.values()),
-            names=list(flight_status.keys()),
-            title=f'Flight Status Distribution ({latest_day["date"].strftime("%Y-%m-%d")})',
-            color_discrete_sequence=['#2ecc71', '#f39c12', '#e74c3c', '#9b59b6']
-        )
-        st.plotly_chart(fig4, use_container_width=True)
+        if len(df_filtered) > 0:
+            latest_day = df_filtered.iloc[-1]
+            flight_status = {
+                'On-Time': latest_day['on_time_flights'],
+                'Delayed': latest_day['delayed_flights'],
+                'Cancelled': latest_day['cancelled_flights'],
+                'Diverted': latest_day['diverted_flights']
+            }
+            
+            fig4 = px.pie(
+                values=list(flight_status.values()),
+                names=list(flight_status.keys()),
+                title=f'Flight Status Distribution ({latest_day["date"].strftime("%Y-%m-%d")})',
+                color_discrete_sequence=['#2ecc71', '#f39c12', '#e74c3c', '#9b59b6']
+            )
+            st.plotly_chart(fig4, use_container_width=True)
+        else:
+            st.warning("No data available for the selected date range.")
     
     # Delay Analysis
     st.markdown("## ⏱️ Delay Type Analysis")
