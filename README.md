@@ -1,108 +1,140 @@
-# FAA Wildlife Strike Dashboard – README
+# FAA Metrics Dashboard ✈️
 
-This repository contains a Python script that generates an interactive, browser-based dashboard analyzing FAA Wildlife Strike data for the years 2019–2020. The dashboard supports the BSAN 726 Group Project and visualizes trends, species involvement, geographic patterns, and COVID-19 pandemic impacts.
+BSAN 726 Group Project - University of Kansas
 
-## Project Overview
+A comprehensive dashboard for visualizing Federal Aviation Administration (FAA) metrics, including KPIs and interactive visualizations for flight operations data.
 
-The included script, FAA_Dashboard_Cleaned.py, loads the cleaned FAA Wildlife Strike dataset, applies time filtering (2019–2020), constructs multiple analytics charts using Plotly, encodes figures into JSON without binary payloads, builds a fully styled dark-themed interactive HTML dashboard, and writes the final dashboard to FAA_Dashboard.html.
+## Features
 
-## Files
+- **Key Performance Indicators (KPIs)**
+  - Total flights
+  - On-time performance percentage
+  - Average delay time
+  - Cancellation rate
+  - Delay and cancellation trends
 
-### 1. FAA_Dashboard_Cleaned.py
-The main Python script that loads, cleans, analyzes, visualizes, and exports the dashboard.
+- **Interactive Visualizations**
+  - On-time performance trends
+  - Average delay time trends
+  - Daily flight operations overview
+  - Flight status distribution
+  - Delay type analysis (Weather, Carrier, NAS, Security, Late Aircraft)
+  - Stacked area charts for delay trends
 
-### 2. FAA_Dashboard_Cleaned.csv
-An external cleaned dataset the script reads. This file must be present at the path defined in the script.
+- **Data Controls**
+  - Adjustable historical data range (30-365 days)
+  - Configurable analysis period (7-90 days)
+  - Data download functionality (CSV export)
 
-### 3. FAA_Dashboard.html
-The generated interactive dashboard.
+## Installation
 
-## Requirements
-
-Python packages required:
-- pandas
-- numpy
-- plotly
-- json
-- base64
-- struct
-
-Install dependencies with:
-
-```
-pip install pandas numpy plotly
-```
-
-## How to Run the Script
-
-1. Ensure the dataset path inside the script matches your local directory:
-
-```
-df = pd.read_csv('/path/to/FAA_Dashboard_Cleaned.csv', low_memory=False)
+1. Clone the repository:
+```bash
+git clone https://github.com/Gerald-Jinx-Mouse/FAA_Dashboard_Cleaned.git
+cd FAA_Dashboard_Cleaned
 ```
 
-2. Run the script:
-
-```
-python FAA_Dashboard_Cleaned.py
-```
-
-3. After running, you will see a message indicating where the HTML dashboard was saved.
-
-4. Open the HTML file in a browser to explore all visualizations interactively.
-
-## Visualizations Included
-
-The dashboard generates 10 interactive Plotly charts grouped into analytical areas:
-
-### Q1: Pandemic Impact
-- Wildlife strikes before vs. during COVID-19 (2019 vs. 2020)
-- Monthly trends by pandemic period
-
-### Q2: Temporal and Geographic Patterns
-- US geo-scatter map of airport strike counts
-- Top states
-- Time-of-day strike distribution
-
-### Q3: Species and Damage
-- Top 10 wildlife species
-- Damage level distribution
-
-### Q4: Aircraft and Operators
-- Top aircraft types
-- Top airline operators
-- Strike counts by phase of flight
-
-## Summary Statistics Calculated
-
-The script computes and displays:
-- Total strike count
-- Strike counts before vs. during pandemic
-- Percent change between years
-- Number of unique states, species, aircraft types, and airports
-
-## Dashboard Styling
-
-The HTML uses:
-- A modern dark UI theme
-- Gradient headers and cards
-- Responsive chart layout
-- Full-width sections for readability
-
-## Project Context
-
-This dashboard was developed for:
-
-BSAN 726 – Enterprise Data Management  
-KU School of Business — Fall 2025
-
-## Output
-
-Running the script produces an HTML dashboard file named:
-
-```
-FAA_Dashboard.html
+2. Install the required dependencies:
+```bash
+pip install -r requirements.txt
 ```
 
-Open the file in a browser to interact with the dashboard.
+## Usage
 
+### Quick Start (Recommended)
+
+Use the quick start script to automatically install dependencies, run tests, and start the dashboard:
+
+```bash
+./start_dashboard.sh
+```
+
+### Manual Start
+
+Run the dashboard using Streamlit:
+
+```bash
+streamlit run faa_dashboard.py
+```
+
+The dashboard will open in your default web browser at `http://localhost:8501`
+
+### Running Tests
+
+To verify the dashboard functionality:
+
+```bash
+python test_dashboard.py
+```
+
+## Dashboard Components
+
+### KPI Metrics Section
+Displays key performance indicators for the last 30 days:
+- Total flights processed
+- On-time performance percentage with trend
+- Average delay time with trend
+- Cancellation rate with trend
+- Total delayed and cancelled flights
+- Diverted flights count
+
+### Visualizations
+1. **On-Time Performance Trend**: Line chart showing on-time percentage over time with target line
+2. **Average Delay Time Trend**: Line chart showing average delay minutes
+3. **Daily Flight Operations**: Multi-line chart showing total, on-time, delayed, and cancelled flights
+4. **Flight Status Distribution**: Pie chart showing current day's flight status breakdown
+5. **Delay Type Analysis**: Bar chart and stacked area chart showing delays by category
+
+### Data Table
+Optional raw data table view with formatted metrics and CSV download capability
+
+## Dependencies
+
+- `streamlit>=1.28.0` - Dashboard framework
+- `pandas>=2.0.0` - Data manipulation
+- `numpy>=1.24.0` - Numerical operations
+- `plotly>=5.17.0` - Interactive visualizations
+
+## Project Structure
+
+```
+FAA_Dashboard_Cleaned/
+├── faa_dashboard.py      # Main dashboard application
+├── test_dashboard.py     # Comprehensive test suite
+├── start_dashboard.sh    # Quick start script (Unix/Linux/Mac)
+├── requirements.txt      # Python dependencies
+├── .gitignore           # Git ignore file
+└── README.md            # This file
+```
+
+## Data
+
+The current implementation uses generated sample data for demonstration purposes. The data includes:
+- Daily flight counts
+- On-time, delayed, cancelled, and diverted flights
+- Delay categories (Weather, Carrier, NAS, Security, Late Aircraft)
+- Performance metrics and rates
+
+To use real FAA data, replace the `generate_sample_data()` function with your data loading logic.
+
+## Customization
+
+You can customize the dashboard by:
+- Modifying the date ranges in the sidebar
+- Adjusting the KPI calculation period
+- Adding new visualizations
+- Integrating real FAA data sources
+- Customizing colors and styling in the CSS section
+
+## Contributing
+
+This is a group project for BSAN 726 at the University of Kansas. For contributions or questions, please contact the project team.
+
+## License
+
+This project is created for educational purposes as part of a university course project.
+
+## Acknowledgments
+
+- University of Kansas - BSAN 726 Course
+- Federal Aviation Administration for data metrics inspiration
