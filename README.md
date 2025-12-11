@@ -41,6 +41,16 @@ pip install -r requirements.txt
 
 ## Usage
 
+### Quick Start (Recommended)
+
+Use the quick start script to automatically install dependencies, run tests, and start the dashboard:
+
+```bash
+./start_dashboard.sh
+```
+
+### Manual Start
+
 Run the dashboard using Streamlit:
 
 ```bash
@@ -48,6 +58,14 @@ streamlit run faa_dashboard.py
 ```
 
 The dashboard will open in your default web browser at `http://localhost:8501`
+
+### Running Tests
+
+To verify the dashboard functionality:
+
+```bash
+python test_dashboard.py
+```
 
 ## Dashboard Components
 
@@ -82,6 +100,8 @@ Optional raw data table view with formatted metrics and CSV download capability
 ```
 FAA_Dashboard_Cleaned/
 ├── faa_dashboard.py      # Main dashboard application
+├── test_dashboard.py     # Comprehensive test suite
+├── start_dashboard.sh    # Quick start script (Unix/Linux/Mac)
 ├── requirements.txt      # Python dependencies
 ├── .gitignore           # Git ignore file
 └── README.md            # This file
